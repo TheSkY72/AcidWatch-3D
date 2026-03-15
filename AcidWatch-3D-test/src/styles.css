@@ -27,6 +27,64 @@ body {
   opacity: 0.8;
 }
 
+.header-point-info {
+  margin: 16px auto 0;
+  max-width: 980px;
+  text-align: left;
+  background: rgba(255, 255, 255, 0.12);
+  border: 1px solid rgba(191, 219, 254, 0.3);
+  border-radius: 14px;
+  padding: 14px 16px;
+  backdrop-filter: blur(6px);
+}
+
+.header-point-info.empty {
+  text-align: center;
+  opacity: 0.95;
+}
+
+.point-meta-grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.point-meta-grid strong {
+  color: #bfdbfe;
+  font-size: 12px;
+  letter-spacing: 0.02em;
+}
+
+.depth-slider-block {
+  margin-bottom: 10px;
+}
+
+.depth-slider-block label {
+  display: block;
+  margin-bottom: 6px;
+}
+
+.custom-depth-ph {
+  color: #93c5fd;
+}
+
+.depth-list {
+  display: grid;
+  gap: 4px;
+  max-height: 140px;
+  overflow: auto;
+  padding-right: 4px;
+}
+
+.depth-row {
+  display: flex;
+  justify-content: space-between;
+  font-variant-numeric: tabular-nums;
+  border-bottom: 1px solid rgba(191, 219, 254, 0.2);
+  padding-bottom: 2px;
+}
+
 /* Dashboard layout */
 
 .dashboard {
@@ -87,6 +145,43 @@ body {
   bottom: 16px;
   transform: translateX(-50%);
   z-index: 2;
+}
+
+.globe-tooltip,
+.scene-tooltip {
+  background: rgba(8, 16, 28, 0.92) !important;
+  border: 1px solid rgba(148, 163, 184, 0.5) !important;
+  border-radius: 10px !important;
+  color: #e2e8f0 !important;
+  padding: 8px 10px !important;
+  font-size: 12px !important;
+  line-height: 1.4;
+  backdrop-filter: blur(4px);
+}
+
+.point-tooltip strong {
+  color: #93c5fd;
+}
+
+.point-tooltip-depth {
+  margin-top: 6px;
+  padding-top: 6px;
+  border-top: 1px solid rgba(148, 163, 184, 0.35);
+}
+
+.point-tooltip-depth-title {
+  margin-bottom: 4px;
+}
+
+.point-tooltip-depth-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 14px;
+  font-variant-numeric: tabular-nums;
+}
+
+.point-tooltip-depth-empty {
+  opacity: 0.8;
 }
 
 /* Controls */
@@ -212,4 +307,10 @@ button.active {
 .shell.dissolving {
   opacity: 0.2;
   stroke-width: 1;
+}
+
+@media (max-width: 920px) {
+  .point-meta-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
 }

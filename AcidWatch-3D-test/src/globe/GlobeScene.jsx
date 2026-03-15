@@ -1,11 +1,11 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import Globe from "react-globe.gl";
 import * as THREE from "three";
 import { phColor } from "../science/phColor";
+import { depthProfile } from "../science/depthModel";
 import { useStore } from "../store";
 import { hotspots } from "../data/hotspots";
-
-const RADIUS = 100;
+import { phHistoricalData } from "../data/ph_historical";
 
 export default function GlobeScene() {
   const globeRef = useRef();
@@ -73,26 +73,97 @@ export default function GlobeScene() {
   };
 
   const year = useStore((s) => s.year);
-  const setSelectedLocation = useStore((s) => s.setSelectedLocation);
+  const setSelectedLocation = useStore((s) => s.setLocation);
 
-  // simple pH model
-  const basePH = 8.2 - (year - 1980) * 0.002;
+  const formatTooltip = (d) => {
+    const lat = Number(d.lat).toFixed(2);
+    const lng = Number(d.lng).toFixed(2);
+    const ph = Number(d.ph).toFixed(3);
+    const depths = depthProfile({ lat: d.lat, lng: d.lng }, d.year);
 
-  // create fake grid points (later replaced with real data)
-  const points = [];
-  // ... (rest of your code)
-  for (let lat = -80; lat < 80; lat += 10) {
-    for (let lng = -180; lng < 180; lng += 10) {
-      // eslint-disable-next-line react-hooks/purity
-      const ph = basePH + (Math.random() - 0.5) * 0.03;
+    const depthRows = depths.length
+      ? depths
+          .map(
+            (item) =>
+              `<div class="point-tooltip-depth-row"><span>${item.depth}m</span><span>${Number(item.ph).toFixed(3)}</span></div>`,
+          )
+          .join("")
+      : `<div class="point-tooltip-depth-empty">No depth data</div>`;
 
-      points.push({
-        lat,
-        lng,
-        ph,
-      });
-    }
-  }
+    return `
+      <div class="point-tooltip">
+        <div><strong>Year:</strong> ${d.year}</div>
+        <div><strong>pH:</strong> ${ph}</div>
+        <div><strong>Lat:</strong> ${lat}°</div>
+        <div><strong>Lng:</strong> ${lng}°</div>
+        <div class="point-tooltip-depth">
+          <div class="point-tooltip-depth-title"><strong>Depth profile</strong></div>
+          ${depthRows}
+        </div>
+      </div>
+    `;
+  };
+
+  const points = useMemo(() => {
+    return Object.entries(phHistoricalData)
+      .map(([coordKey, yearlyData]) => {
+        const [latStr, lngStr] = coordKey.split(",");
+        const lat = Number(latStr);
+        const lng = Number(lngStr);
+
+        const yearSamples = Object.entries(yearlyData)
+          .map(([yearKey, yearValue]) => ({
+            year: Number(yearKey),
+            ph: yearValue?.surface?.pH,
+          }))
+          .filter(
+            (sample) =>
+              Number.isFinite(sample.year) && typeof sample.ph === "number",
+          )
+          .sort((a, b) => a.year - b.year);
+
+        if (
+          !yearSamples.length ||
+          !Number.isFinite(lat) ||
+          !Number.isFinite(lng)
+        ) {
+          return null;
+        }
+
+        const first = yearSamples[0];
+        const last = yearSamples[yearSamples.length - 1];
+
+        let ph;
+
+        if (year <= first.year) {
+          ph = first.ph;
+        } else if (year >= last.year) {
+          ph = last.ph;
+        } else {
+          const upperIndex = yearSamples.findIndex(
+            (sample) => sample.year >= year,
+          );
+          const upper = yearSamples[upperIndex];
+          const lower = yearSamples[upperIndex - 1];
+
+          if (upper.year === lower.year) {
+            ph = upper.ph;
+          } else {
+            const t = (year - lower.year) / (upper.year - lower.year);
+            ph = lower.ph + (upper.ph - lower.ph) * t;
+          }
+        }
+
+        return {
+          lat,
+          lng,
+          ph,
+          year,
+        };
+      })
+      .filter(Boolean);
+  }, [year]);
+
   useEffect(() => {
     const globe = globeRef.current;
     if (!globe) return;
@@ -152,6 +223,7 @@ export default function GlobeScene() {
           pointAltitude={0.01}
           pointColor={(d) => phColor(d.ph)}
           pointRadius={0.5}
+          pointLabel={formatTooltip}
           labelsData={hotspots}
           labelLat={(d) => d.lat}
           labelLng={(d) => d.lng}

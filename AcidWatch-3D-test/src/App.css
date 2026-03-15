@@ -1,7 +1,7 @@
 .app {
-  display: flex;
-  height: 100vh;
-  overflow: hidden;
+  display: block;
+  min-height: 100vh;
+  overflow-x: hidden;
 }
 
 .globe-container {
@@ -17,11 +17,9 @@
   overflow-y: auto;
 }
 
-
 .header {
   padding: 20px;
 }
-
 
 .controls {
   margin-top: 20px;
@@ -29,10 +27,6 @@
   justify-content: center;
   gap: 20px;
 }
-
-
-
-
 
 .controls-card {
   background: white;
