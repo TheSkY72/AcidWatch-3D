@@ -2,7 +2,6 @@ import React from "react";
 
 import GlobeScene from "./globe/GlobeScene";
 import YearScrubber from "./ui/YearScrubber";
-import ScenarioButtons from "./ui/ScenarioButtons";
 import CO2Slider from "./ui/CO2Slider";
 import DepthPanel from "./panels/DepthPanel";
 
@@ -22,8 +21,6 @@ function App() {
 
         <div className="controls-card">
           <YearScrubber />
-
-          <ScenarioButtons />
 
           <CO2Slider />
         </div>
