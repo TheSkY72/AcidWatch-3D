@@ -1,12 +1,50 @@
 import { phHistoricalData } from "../data/ph_historical";
 
+function getLocationRecord(selectedLocation) {
+  if (!selectedLocation) return null;
+
+  const lat = Number(selectedLocation.lat);
+  const lng = Number(selectedLocation.lng);
+  if (!Number.isFinite(lat) || !Number.isFinite(lng)) return null;
+
+  const directKey = `${lat},${lng}`;
+  if (phHistoricalData[directKey]) {
+    return phHistoricalData[directKey];
+  }
+
+  // Source data keys are often serialized with one decimal place.
+  const oneDecimalKey = `${lat.toFixed(1)},${lng.toFixed(1)}`;
+  if (phHistoricalData[oneDecimalKey]) {
+    return phHistoricalData[oneDecimalKey];
+  }
+
+  // Fallback for any unusual key formatting in the source data.
+  const matchKey = Object.keys(phHistoricalData).find((coordKey) => {
+    const [keyLat, keyLng] = coordKey.split(",").map(Number);
+    return Math.abs(keyLat - lat) < 1e-6 && Math.abs(keyLng - lng) < 1e-6;
+  });
+
+  return matchKey ? phHistoricalData[matchKey] : null;
+}
+
+function getDepthPHValue(depthEntry) {
+  if (typeof depthEntry === "number") return depthEntry;
+  if (depthEntry && typeof depthEntry.pH === "number") return depthEntry.pH;
+  return undefined;
+}
+
 export function depthProfile(selectedLocation, year) {
   if (!selectedLocation || !Number.isFinite(year)) return [];
 
-  const key = `${selectedLocation.lat},${selectedLocation.lng}`;
-  const locationRecord = phHistoricalData[key];
-  if (!locationRecord) return [];
-  console.log(locationRecord);
+  const locationRecord = getLocationRecord(selectedLocation);
+  if (!locationRecord) {
+    console.warn(
+      "No depth profile record found for location",
+      selectedLocation,
+    );
+    return [];
+  }
+
   const years = Object.keys(locationRecord)
     .map(Number)
     .filter(Number.isFinite)
@@ -49,8 +87,8 @@ export function depthProfile(selectedLocation, year) {
   return depthKeys
     .map((depth) => {
       const depthKey = String(depth);
-      const lowerPH = lowerDepthData[depthKey]?.pH;
-      const upperPH = upperDepthData[depthKey]?.pH;
+      const lowerPH = getDepthPHValue(lowerDepthData[depthKey]);
+      const upperPH = getDepthPHValue(upperDepthData[depthKey]);
 
       if (typeof lowerPH === "number" && typeof upperPH === "number") {
         return {

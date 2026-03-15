@@ -22,3 +22,6 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+phFixed.py
+ne_110m_land.shp
+.venv/*
