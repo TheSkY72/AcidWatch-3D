@@ -9,7 +9,7 @@ function App() {
   return (
     <div className="app">
       <header className="header">
-        <h1>AcidWatch</h1>
+        <h1>AcidWatch 3D</h1>
         <p>Interactive Ocean Acidification Explorer</p>
         <DepthPanel />
       </header>
