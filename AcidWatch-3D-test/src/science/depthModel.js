@@ -6,7 +6,7 @@ export function depthProfile(selectedLocation, year) {
   const key = `${selectedLocation.lat},${selectedLocation.lng}`;
   const locationRecord = phHistoricalData[key];
   if (!locationRecord) return [];
-
+  console.log(locationRecord);
   const years = Object.keys(locationRecord)
     .map(Number)
     .filter(Number.isFinite)
