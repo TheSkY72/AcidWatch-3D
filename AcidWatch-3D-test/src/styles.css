@@ -147,6 +147,99 @@ body {
   z-index: 2;
 }
 
+/* Speed control container - positioned in top-left corner of globe */
+.speed-control {
+  /* Absolute positioning places this in the top-left corner */
+  position: absolute;
+  top: 16px;
+  left: 16px;
+  z-index: 2;
+  
+  /* Flexbox layout for vertical stacking of label, slider, and value */
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  
+  /* Styling for the container */
+  background: rgba(0, 0, 0, 0.4);
+  padding: 12px 16px;
+  border-radius: 8px;
+  backdrop-filter: blur(8px);
+}
+
+/* Label text above the slider */
+.speed-label {
+  /* Typography styling */
+  font-size: 0.85rem;
+  font-weight: 500;
+  color: #fff;
+  
+  /* Ensure label doesn't interfere with input */
+  display: block;
+  margin-bottom: 4px;
+}
+
+/* The range slider input */
+.speed-slider {
+  /* Width and height of the slider track */
+  width: 140px;
+  height: 6px;
+  outline: none;
+  cursor: pointer;
+  
+  /* Slider styling for different browsers */
+  -webkit-appearance: none;
+  appearance: none;
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 3px;
+}
+
+/* Slider thumb (the draggable handle) */
+.speed-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #ff9800;
+  cursor: pointer;
+  box-shadow: 0 2px 6px rgba(255, 152, 0, 0.4);
+  transition: all 0.2s;
+}
+
+.speed-slider::-moz-range-thumb {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #ff9800;
+  cursor: pointer;
+  border: none;
+  box-shadow: 0 2px 6px rgba(255, 152, 0, 0.4);
+  transition: all 0.2s;
+}
+
+/* Hover state for slider thumb */
+.speed-slider::-webkit-slider-thumb:hover {
+  background: #f57c00;
+  box-shadow: 0 2px 8px rgba(255, 152, 0, 0.6);
+}
+
+.speed-slider::-moz-range-thumb:hover {
+  background: #f57c00;
+  box-shadow: 0 2px 8px rgba(255, 152, 0, 0.6);
+}
+
+/* Speed value display (e.g., "0.4x") */
+.speed-value {
+  /* Typography and styling */
+  font-size: 0.8rem;
+  font-weight: 600;
+  color: #ff9800;
+  
+  /* Center the text */
+  text-align: center;
+}
+
 .globe-tooltip,
 .scene-tooltip {
   background: rgba(8, 16, 28, 0.92) !important;

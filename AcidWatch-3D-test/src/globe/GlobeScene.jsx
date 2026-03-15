@@ -7,7 +7,10 @@ import { useStore } from "../store";
 import { hotspots } from "../data/hotspots";
 import { phHistoricalData } from "../data/ph_historical";
 
-export default function GlobeScene() {
+// Component receives 2 props for controlling globe speed:
+// - spinSpeed: number (0-2) controlling how fast the globe rotates
+// - onSpeedChange: function called when user adjusts the speed slider
+export default function GlobeScene({ spinSpeed = 0.4, onSpeedChange }) {
   const globeRef = useRef();
   const containerRef = useRef(null);
   const tourTimeoutRef = useRef(null);
@@ -168,8 +171,12 @@ export default function GlobeScene() {
     const globe = globeRef.current;
     if (!globe) return;
 
+    // Enable auto-rotate on the globe (always spinning)
     globe.controls().autoRotate = true;
-    globe.controls().autoRotateSpeed = 0.4;
+    
+    // Set the rotation speed from the spinSpeed prop (controlled by slider)
+    // Range: 0-2 with 0.4 as default moderate speed
+    globe.controls().autoRotateSpeed = spinSpeed;
 
     const light = new THREE.AmbientLight(0xffffff, 1.2);
     globe.scene().add(light);
@@ -177,7 +184,7 @@ export default function GlobeScene() {
     return () => {
       globe.scene().remove(light);
     };
-  }, []);
+  }, [spinSpeed]);
 
   useEffect(() => {
     const container = containerRef.current;
@@ -243,6 +250,29 @@ export default function GlobeScene() {
       >
         {isShowing ? "Stop Exploring" : "Explore Hotspots"}
       </button>
+
+      {/* Speed control slider positioned in the top-left corner of the globe */}
+      {/* Allows user to adjust how fast the globe rotates */}
+      {onSpeedChange && (
+        <div className="speed-control">
+          {/* Label for the speed slider */}
+          <label htmlFor="speed-slider" className="speed-label">Speed of Spin</label>
+          {/* Slider input ranging from 0 to 2 */}
+          <input
+            id="speed-slider"
+            type="range"
+            min="0"
+            max="2"
+            step="0.1"
+            value={spinSpeed}
+            onChange={(e) => onSpeedChange(parseFloat(e.target.value))}
+            className="speed-slider"
+            aria-label="Globe rotation speed"
+          />
+          {/* Display current speed value as text */}
+          <span className="speed-value">{spinSpeed.toFixed(1)}x</span>
+        </div>
+      )}
     </div>
   );
 }
